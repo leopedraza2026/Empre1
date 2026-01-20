@@ -146,13 +146,12 @@
             display: flex;
             gap: 10px;
             margin-top: 15px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
+            margin-bottom: 15px;
         }
         
         .btn-action-like {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #eee;
             background: #fff;
             border-radius: 8px;
@@ -164,13 +163,14 @@
             justify-content: center;
             gap: 5px;
             transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .btn-action-like:hover { background: #fff0f0; color: var(--accent-orange); border-color: var(--accent-orange); }
         .btn-action-like.liked { color: var(--accent-orange); border-color: var(--accent-orange); background: #fff0f0; }
 
         .btn-action-comment {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #eee;
             background: #fff;
             border-radius: 8px;
@@ -182,6 +182,7 @@
             justify-content: center;
             gap: 5px;
             transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .btn-action-comment:hover { background: #f0f8ff; color: var(--primary-blue); border-color: var(--primary-blue); }
 
@@ -209,8 +210,50 @@
         .comment-date { font-size: 0.7rem; color: #999; text-align: right; margin-top: 5px; }
 
         .comment-input-area { display: flex; flex-direction: column; gap: 10px; }
-        .input-nombre { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .input-nombre, .input-email { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
         .input-texto { padding: 10px; border: 1px solid #ddd; border-radius: 8px; resize: vertical; min-height: 60px; }
+
+        /* --- NUEVO: PERFIL MINI EN TARJETA DE PRODUCTO --- */
+        .store-mini-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f4f7f6;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+        }
+        .store-mini-logo {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        .store-mini-details { flex: 1; display: flex; align-items: center; justify-content: space-between; }
+        .store-mini-name { font-size: 0.85rem; font-weight: bold; color: var(--primary-blue); line-height: 1.2; }
+        .store-mini-loc { font-size: 0.7rem; color: #777; }
+        
+        .btn-mini-follow {
+            font-size: 0.7rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--accent-gold);
+            background: white;
+            color: var(--primary-blue);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-mini-follow:hover { background: #fffdf0; }
+        .btn-mini-follow.following { background: var(--accent-gold); color: var(--primary-blue); font-weight: bold; border-color: var(--accent-gold); }
 
         /* --- HEADER & NAVEGACIÓN RESPONSIVE --- */
         header { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 1rem 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -343,6 +386,29 @@
         </div>
     </div>
 
+    <!-- Modal de Invitado (Para Email y Nombre) -->
+    <div id="guest-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title">👤 Identificación Necesaria</h3>
+            <p style="text-align:center; color:#666; margin-bottom:20px; font-size:0.9rem;">Para interactuar con la tienda, necesitamos tus datos.</p>
+            
+            <div class="form-group">
+                <label>Tu Nombre</label>
+                <input type="text" id="guest-name" class="form-control" placeholder="Ej: Ana García">
+            </div>
+            
+            <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" id="guest-email" class="form-control" placeholder="Ej: ana@gmail.com">
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn btn-blue btn-sm" onclick="saveGuestInfo()">Guardar y Continuar</button>
+                <button class="btn btn-red btn-sm" onclick="document.getElementById('guest-modal').classList.remove('active')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Comentarios -->
     <div id="comments-modal" class="modal-overlay">
         <div class="modal-content">
@@ -356,6 +422,7 @@
 
             <div class="comment-input-area">
                 <input type="text" id="comment-user-name" class="input-nombre" placeholder="Tu nombre (ej: María)" maxlength="20">
+                <input type="email" id="comment-user-email" class="input-email" placeholder="Tu correo (ej: maria@mail.com)">
                 <textarea id="comment-text" class="input-texto" placeholder="Escribe tu opinión sobre esta prenda..."></textarea>
                 <div style="display:flex; gap:10px;">
                     <button class="btn btn-blue btn-sm" onclick="submitComment()">Publicar</button>
@@ -475,7 +542,7 @@
                 
                 <div style="margin-top: 2rem; overflow-x: auto;">
                     <table style="width:100%; border-collapse:collapse; text-align: left;">
-                        <thead><tr style="background:var(--primary-blue); color:white;"><th style="padding:15px;">Usuario</th><th>Rol</th><th>Tienda</th><th>Teléfono</th><th>Acción</th></tr></thead>
+                        <thead><tr style="background:var(--primary-blue); color:white;"><th style="padding:15px;">Usuario</th><th>Rol</th><th>Tienda</th><th>Teléfono</th><th>Seguidores</th><th>Acción</th></tr></thead>
                         <tbody id="users-list-body"></tbody>
                     </table>
                 </div>
@@ -556,7 +623,6 @@
                             </div>
                         </div>
 
-                        <!-- BOTÓN INTELIGENTE DE TIENDA -->
                         <button id="btn-save-store" class="btn btn-blue btn-sm" style="width:100%; margin-top:15px;" onclick="saveStoreConfig()">Guardar Datos de Tienda</button>
                     </div>
 
@@ -632,7 +698,6 @@
                             <img id="prod-img-preview" class="product-preview-img" alt="Vista previa producto">
                         </div>
                         
-                        <!-- BOTÓN INTELIGENTE DE PUBLICAR -->
                         <button id="btn-add-product" class="btn btn-blue" style="width:100%" onclick="addProduct()">Publicar en Mi Mini Tienda</button>
                         <div id="prod-autosave" class="autosave-indicator">Borrador guardado...</div>
                     </div>
@@ -684,8 +749,12 @@
     </main>
 
     <script>
-        // --- VARIABLE GLOBAL PARA COMENTARIOS ---
+        // --- VARIABLES GLOBALES ---
         let currentCommentProductId = null;
+        let pendingAction = null; 
+
+        // Datos del cliente temporal (no vendedor)
+        let guestInfo = JSON.parse(localStorage.getItem('guest_info')) || null;
 
         // --- FUNCIÓN PARA SOLUCIONAR EL PROBLEMA DE FILTROS ---
         function resetFilters() {
@@ -702,7 +771,7 @@
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             
-            let icon = type === 'success' ? '✅' : (type === 'error' ? '⚠️' : 'ℹ️');
+            let icon = type === 'success' ? '✅' : (type === 'error' ? '⚠️' : '🔔');
             
             toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
             
@@ -767,14 +836,13 @@
                 return;
             }
 
-            // Ordenar: más recientes primero
             const sorted = [...product.comments].reverse();
             
             sorted.forEach(c => {
                 const item = document.createElement('div');
                 item.className = 'comment-item';
                 item.innerHTML = `
-                    <div class="comment-user">${c.user}</div>
+                    <div class="comment-user">${c.user} <span style="font-size:0.7rem; color:#999;">(${c.email})</span></div>
                     <div class="comment-text">${c.text}</div>
                     <div class="comment-date">${c.date}</div>
                 `;
@@ -784,12 +852,14 @@
 
         function submitComment() {
             const nameInput = document.getElementById('comment-user-name');
+            const emailInput = document.getElementById('comment-user-email');
             const textInput = document.getElementById('comment-text');
             const user = nameInput.value.trim();
+            const email = emailInput.value.trim();
             const text = textInput.value.trim();
 
-            if(!user) return showToast("Por favor ingresa tu nombre", "error");
-            if(!text) return showToast("El comentario no puede estar vacío", "error");
+            // Validación Email Simple
+            if(!email.includes('@')) return showToast("Ingresa un correo válido", "error");
 
             const product = products.find(p => p.id === currentCommentProductId);
             if(product) {
@@ -797,6 +867,7 @@
                 
                 const newComment = {
                     user: user,
+                    email: email,
                     text: text,
                     date: new Date().toLocaleDateString()
                 };
@@ -805,29 +876,86 @@
                 saveData();
                 
                 renderComments(product);
-                textInput.value = ''; // Limpiar texto, mantener nombre
+                textInput.value = ''; // Limpiar texto, mantener nombre y email
                 
                 showToast("Comentario publicado");
             }
         }
 
+        // --- LÓGICA DE SEGUIR TIENDA ---
+        function followStore(username) {
+            // Asegurar datos del cliente
+            checkGuestInfo(() => {
+                const user = users.find(u => u.user === username);
+                if(user) {
+                    if(!user.followers) user.followers = [];
+                    
+                    const emailIndex = user.followers.indexOf(guestInfo.email);
+                    
+                    if(emailIndex === -1) {
+                        user.followers.push(guestInfo.email);
+                        saveData();
+                        showToast("¡Siguiendo tienda! Te notificaremos cuando haya novedades.");
+                        // Si estamos en la vista de tiendas o catalogo, refrescar
+                        if(document.getElementById('view-stores').classList.contains('hidden') === false) renderStoresList();
+                        else filterProducts(); 
+                    } else {
+                        user.followers.splice(emailIndex, 1);
+                        saveData();
+                        showToast("Has dejado de seguir esta tienda.");
+                        if(document.getElementById('view-stores').classList.contains('hidden') === false) renderStoresList();
+                        else filterProducts();
+                    }
+                }
+            });
+        }
+
         // --- LÓGICA DE LIKES ---
         function likeProduct(id, btnElement) {
-            const product = products.find(p => p.id === id);
-            if(product) {
-                // Si no existe, inicializar
-                if(typeof product.likes === 'undefined') product.likes = 0;
-                
-                product.likes++;
-                saveData();
-                
-                // Actualizar UI directamente sin recargar todo
-                const span = btnElement.querySelector('span');
-                if(span) span.innerText = product.likes;
-                
-                // Animación visual
-                btnElement.classList.add('liked');
-                setTimeout(() => btnElement.classList.remove('liked'), 300);
+            checkGuestInfo(() => {
+                const product = products.find(p => p.id === id);
+                if(product) {
+                    if(typeof product.likes === 'undefined') product.likes = 0;
+                    
+                    product.likes++;
+                    saveData();
+                    
+                    const span = btnElement.querySelector('span');
+                    if(span) span.innerText = product.likes;
+                    
+                    btnElement.classList.add('liked');
+                    setTimeout(() => btnElement.classList.remove('liked'), 300);
+                }
+            });
+        }
+
+        // --- SISTEMA DE INVITADO (LOGIN RÁPIDO) ---
+        function checkGuestInfo(callback) {
+            if(guestInfo) {
+                callback();
+            } else {
+                pendingAction = callback;
+                document.getElementById('guest-modal').classList.add('active');
+            }
+        }
+
+        function saveGuestInfo() {
+            const name = document.getElementById('guest-name').value;
+            const email = document.getElementById('guest-email').value;
+            
+            if(!name || !email || !email.includes('@')) {
+                showToast("Por favor completa tus datos correctamente", "error");
+                return;
+            }
+
+            guestInfo = { name, email };
+            localStorage.setItem('guest_info', JSON.stringify(guestInfo));
+            
+            document.getElementById('guest-modal').classList.remove('active');
+            
+            if(pendingAction) {
+                pendingAction();
+                pendingAction = null;
             }
         }
 
@@ -864,7 +992,7 @@
                 users.push({
                     user:u, pass:p, role:'vendedor', phone:ph, 
                     storeName:'', storeLogo:'', storeCover:'',
-                    fullname: u, storeDept: 'La Paz'
+                    fullname: u, storeDept: 'La Paz', followers: []
                 });
                 saveData();
                 renderUsers();
@@ -950,20 +1078,19 @@
             { 
                 user: 'admin', pass: '1234', role: 'admin', phone: '61348083', 
                 storeName: 'Oficial BO', storeLogo: 'https://picsum.photos/seed/logo1/100/100', storeCover: 'https://picsum.photos/seed/cover1/300/150', fullname: 'Administrador',
-                storeDept: 'La Paz'
+                storeDept: 'La Paz', followers: []
             },
             { 
                 user: 'vendedor', pass: '1234', role: 'vendedor', phone: '71234567', 
                 storeName: 'Modas Juan', storeLogo: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=150', storeCover: 'https://images.unsplash.com/photo-1558171813-4c088753af8f?q=80&w=300', fullname: 'Juan Pérez',
-                storeDept: 'Santa Cruz'
+                storeDept: 'Santa Cruz', followers: ['cliente1@mail.com'] // Ejemplo de seguidor
             }
         ];
 
         const defaultProducts = [
-            // Agregamos likes y comments por defecto
             { id: 1, name: "Blazer Elegante", category: "Chaqueta", price: 250, dept: "La Paz", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1936", seller: "vendedor", desc: "Elegancia pura.", sellerPhone: "71234567", stock: 5, likes: 12, comments: [] },
             { id: 2, name: "Vestido Floral", category: "Vestido", price: 180, dept: "Santa Cruz", img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=1887", seller: "vendedor", desc: "Para el verano.", sellerPhone: "71234567", stock: 10, likes: 5, comments: [] },
-            { id: 3, name: "Zapatillas Urbanas", category: "Zapatillas", price: 300, dept: "Cochabamba", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2070", seller: "admin", desc: "Estilo urbano.", sellerPhone: "61348083", stock: 2, likes: 20, comments: [{user:"Cliente", text:"Muy buenas!", date:"18/01/2026"}] }
+            { id: 3, name: "Zapatillas Urbanas", category: "Zapatillas", price: 300, dept: "Cochabamba", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2070", seller: "admin", desc: "Estilo urbano.", sellerPhone: "61348083", stock: 2, likes: 20, comments: [{user:"Cliente", text:"Muy buenas!", email:"cliente@test.com", date:"18/01/2026"}] }
         ];
 
         let users = JSON.parse(localStorage.getItem('bo_users')) || defaultUsers;
@@ -1069,6 +1196,11 @@
                 const logo = s.storeLogo || 'https://via.placeholder.com/80?text=Logo';
                 const cover = s.storeCover || 'https://via.placeholder.com/300x150?text=Portada';
                 
+                // Verificar si el usuario actual (invitado) sigue esta tienda
+                const isFollowing = guestInfo && s.followers && s.followers.includes(guestInfo.email);
+                const followBtnText = isFollowing ? "✓ Siguiendo" : "🔔 Seguir";
+                const followBtnClass = isFollowing ? "btn-sm following" : "btn-sm btn-gold"; // Usamos estilo similar
+
                 card.innerHTML = `
                     <img src="${cover}" class="store-cover">
                     <div class="store-logo-container">
@@ -1078,7 +1210,10 @@
                         <h3 class="store-name">${s.storeName}</h3>
                         <p class="store-seller">Vendedor: ${s.fullname || s.user}</p>
                         <div class="store-loc">📍 ${s.storeDept || 'Bolivia'}</div>
-                        <button class="btn btn-blue btn-sm" onclick="enterSellerStore('${s.user}')">Ir a Tienda</button>
+                        <div class="store-actions">
+                            <button class="btn btn-blue btn-sm" onclick="enterSellerStore('${s.user}')">Ir a Tienda</button>
+                            <button class="${followBtnClass}" onclick="followStore('${s.user}')">${followBtnText}</button>
+                        </div>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -1292,6 +1427,12 @@
                 products.unshift(newProd);
                 saveData();
                 
+                // --- NOTIFICACIÓN A SEGUIDORES ---
+                const followersCount = currentUser.followers ? currentUser.followers.length : 0;
+                if(followersCount > 0) {
+                    showToast(`📧 Notificación enviada a ${followersCount} seguidores.`);
+                }
+
                 showToast("¡Producto guardado!");
                 
                 document.getElementById('prod-name').value = '';
@@ -1325,7 +1466,7 @@
             }
         }
 
-        // --- CATALOGO (FILTROS + NUEVAS FUNCIONES) ---
+        // --- CATALOGO (FILTROS + NUEVAS FUNCIONES + NUEVA INTERFAZ) ---
         function filterProducts() {
             const dept = document.getElementById('dept-filter').value;
             const search = document.getElementById('search-input').value.toLowerCase();
@@ -1357,7 +1498,19 @@
                 const waMsg = `Hola, vi "${p.name}" en BO Emprendedores. ¿Disponible?`;
                 const waLink = `https://wa.me/${p.sellerPhone}?text=${encodeURIComponent(waMsg)}`;
 
-                // Generar HTML con Likes y Comentarios
+                // OBTENER DATOS DEL VENDEDOR PARA EL MINI PERFIL EN LA TARJETA
+                const seller = users.find(u => u.user === p.seller);
+                const storeLogo = seller?.storeLogo || 'https://via.placeholder.com/40/40.png';
+                const storeName = seller?.storeName || seller?.fullname || p.seller;
+                
+                // Verificar estado de seguimiento
+                let isFollowing = false;
+                if(guestInfo && seller?.followers) {
+                    isFollowing = seller.followers.includes(guestInfo.email);
+                }
+                const followBtnText = isFollowing ? "Siguiendo" : "Seguir";
+                const followBtnClass = isFollowing ? "btn-mini-follow following" : "btn-mini-follow";
+
                 grid.innerHTML += `
                     <div class="product-card">
                         <img src="${p.img}" class="product-img">
@@ -1367,13 +1520,27 @@
                             <div class="product-price">Bs. ${p.price}</div>
                             <p style="font-size:0.85rem; color:#666;">${p.desc}</p>
                             
-                            <!-- NUEVAS ACCIONES SOCIALES -->
+                            <!-- NUEVO SECCIÓN: PERFIL MINI DE TIENDA -->
+                            <div class="store-mini-profile">
+                                <img src="${storeLogo}" class="store-mini-logo">
+                                <div class="store-mini-details">
+                                    <div>
+                                        <div class="store-mini-name">${storeName}</div>
+                                        <div class="store-mini-loc">📍 ${p.dept}</div>
+                                    </div>
+                                    <button class="${followBtnClass}" onclick="followStore('${p.seller}')">
+                                        ${isFollowing ? '✓' : '+'} ${followBtnText}
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- NUEVA POSICIÓN: ACCIONES SOCIALES (Moved up) -->
                             <div class="social-actions">
                                 <button class="btn-action-like" onclick="likeProduct(${p.id}, this)">
                                     ❤️ <span id="likes-count-${p.id}">${p.likes || 0}</span>
                                 </button>
                                 <button class="btn-action-comment" onclick="openCommentModal(${p.id})">
-                                    💬 Comentar (${p.comments ? p.comments.length : 0})
+                                    💬 ${p.comments ? p.comments.length : 0}
                                 </button>
                             </div>
 
@@ -1399,6 +1566,7 @@
                         <td>${u.role}</td>
                         <td>${u.storeName || '-'}</td>
                         <td>${u.phone || '-'}</td>
+                        <td>${u.followers ? u.followers.length : 0}</td>
                         <td>${u.role !== 'admin' ? `<button class="btn-red btn-sm" onclick="delUser('${u.user}')">Borrar</button>` : ''}</td>
                     </tr>
                 `;
